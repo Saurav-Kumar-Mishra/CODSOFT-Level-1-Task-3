@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia">
+    <title>Calculator</title>
+
+
+<style>
+
+body {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 40px 50px;
+    justify-content: space-around;
+}
+
+pre {
+    width: max-content;
+    font-size: 80px;
+    font-weight: bold;
+    font-family: "Sofia", sans-serif;
+    color: rgb(2, 48, 2);
+}
+
+.wrapper {
+    display: flex;
+    gap: 30px;
+    margin: 0 50px;
+}
+
+
+
+.card {
+    width: 300px;
+    transition: 0.5s;
+    background-size: 400%;
+    position: relative;
+    border-radius: 20px;
+    animation: bordermotion 5s linear infinite;
+    padding: 20px;
+    text-align: center;
+    color: white;
+}
+
+
+
+.card::after {
+    position: absolute;
+    content: " ";
+    inset: 4px;
+    background: white;
+    background-size: 30px 100px;
+    border-radius: 20px;
+    border: 8px ridge rgb(104, 104, 104);
+}
+
+#calculator {
+    width: 100%;
+    margin: 0;
+    position: relative;
+    box-sizing: border-box;
+    z-index: 3;
+}
+
+#calculator #screen {
+    box-sizing: border-box;
+    background-color: rgb(245, 245, 245);
+    padding: 10px;
+    text-align: right;
+}
+
+#calculator #screen input {
+    display: block;
+    width: 100%;
+    height: 50px;
+    padding: 10px 5px;
+    box-sizing: border-box;
+    outline: none;
+    border: none;
+    font-size: 18px;
+    background-color: transparent;
+    color: black;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#calculator #screen output {
+    display: block;
+    width: 100%;
+    height: 25px;
+    box-sizing: border-box;
+    text-align: right;
+    color: black;
+    font-family: Arial, Helvetica, sans-serif;
+    margin-top: 5px;
+}
+
+#calculator #inputs div {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: white;
+}
+
+#calculator #inputs div button {
+    width: 25%;
+    height: 75px;
+    background-color: transparent;
+    border: none;
+    color: black;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#calculator #inputs div button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+#calculator #inputs div button.operator {
+    background-color: rgba(241, 170, 37, 0.973);
+    color: black;
+    font-weight: bold;
+}
+
+
+
+</style>
+</head>
+<body>
+    <pre>Basic Arithmetic
+  Calculator</pre>
+
+    <div class="wrapper">
+        <div class="card">
+         <div class="top" id="calculator">  
+            <div id="screen">
+                <input type="text" readonly value="0"/>
+                <output></output>
+            </div>
+    
+            
+            <div id="inputs">
+                <div>
+                    <button class="operator">AC</button>
+                    <button class="operator">C</button>
+                    <button class="operator">^</button>
+                    <button class="operator">/</button>
+                </div>
+    
+                <div>
+                    <button>7</button>
+                    <button>8</button>
+                    <button>9</button>
+                    <button class="operator">*</button>
+                </div>
+    
+                <div>
+                    <button>4</button>
+                    <button>5</button>
+                    <button>6</button>
+                    <button class="operator">-</button>
+                </div>
+    
+                <div>
+                    <button>1</button>
+                    <button>2</button>
+                    <button>3</button>
+                    <button class="operator">+</button>
+                </div>
+    
+                <div>
+                    <button>00</button>
+                    <button>0</button>
+                    <button>.</button>
+                    <button class="operator">=</button>
+                </div>
+            </div>
+        </div>
+        </div>
+      </div>
+
+
+</body>
+    <script>
+
+const screenInput = document.getElementById('screen').querySelector('input');
+const screenOutput = document.getElementById('screen').querySelector('output');
+
+const inputButtons = document.getElementById('inputs').querySelectorAll('button');
+
+inputButtons.forEach(button => {
+    button.addEventListener('mousedown', (e) => {
+        e.target.style.backgroundColor = 'rgba(20, 20, 20, 0.2)';
+    });
+    button.addEventListener('mouseup', (e) => {
+        e.target.style.backgroundColor = '';
+    });
+    button.addEventListener('click', (e) => {
+        handleInput(e.target.innerHTML);
+    });
+});
+
+document.addEventListener('keydown', (e) => {
+    switch (e.key) {
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+        case '0':
+        case '/':
+        case '*':
+        case '-':
+        case '+':
+        case '.':
+        case '^':
+        case '=':
+            handleInput(e.key);
+            break;
+
+        case 'Enter':
+            handleInput("=");
+            break;
+
+        case 'Backspace':
+            handleInput("C");
+            break;
+
+        case 'Escape':
+            handleInput("AC");
+            break;
+
+        default:
+            return;
+    }
+});
+
+let inputExpression = "";
+
+const handleInput = (value) => {
+    if (inputExpression.length === 25 && value !== "AC" && value !== "C" && value !== "=") {
+        screenOutput.innerHTML = "Maximum Inputs Received!";
+        return;
+    }
+
+    screenOutput.innerHTML = "";
+
+    switch (value) {
+        case '/':
+        case '*':
+        case '-':
+        case '+':
+        case '^':
+            if (inputExpression === "") inputExpression += 0 + value;
+            else {
+                switch (inputExpression.slice(-1)) {
+                    case '/':
+                    case '*':
+                    case '-':
+                    case '+':
+                    case '^':
+                        inputExpression = inputExpression.slice(0, -1) + value;
+                        break;
+
+                    case '.':
+                        inputExpression += '0' + value;
+                        break;
+
+                    default:
+                        inputExpression += value;
+                }
+            }
+            break;
+
+        case '.':
+            if (inputExpression === '') inputExpression += "0.";
+            else {
+                switch (inputExpression.slice(-1)) {
+                    case '.':
+                        break;
+
+                    case '/':
+                    case '*':
+                    case '-':
+                    case '+':
+                    case '^':
+                        inputExpression += "0.";
+                        break;
+
+                    default:
+                        inputExpression += ".";
+                }
+            }
+            break;
+
+        case 'AC':
+            inputExpression = "";
+            break;
+
+        case 'C':
+            inputExpression = inputExpression.slice(0, -1);
+            break;
+
+        case '0':
+        case '00':
+            if (inputExpression === "") inputExpression = "";
+            else if (inputExpression.slice(-1) === '0') {
+                if (inputExpression.length > 1) {
+                    switch (inputExpression.slice(-2, -1)) {
+                        case '/':
+                        case '*':
+                        case '-':
+                        case '+':
+                        case '^':
+                            break;
+
+                        default:
+                            inputExpression += "0";
+                    }
+                }
+            } else {
+                switch (inputExpression.slice(-1)) {
+                    case '/':
+                    case '*':
+                    case '-':
+                    case '+':
+                    case '^':
+                        inputExpression += "0";
+                        break;
+
+                    default:
+                        inputExpression += value;
+                }
+            }
+            break;
+
+        case '=':
+            if (inputExpression !== "") inputExpression = solve();
+            break;
+
+        default:
+            if (inputExpression.slice(-1) === "0") {
+                switch (inputExpression.slice(-2, -1)) {
+                    case '/':
+                    case '*':
+                    case '-':
+                    case '+':
+                    case '^':
+                        inputExpression = inputExpression.slice(0, -1) + value;
+                        break;
+
+                    default:
+                        inputExpression += value;
+                }
+            } else {
+                inputExpression += value;
+            }
+    }
+
+    screenInput.value = inputExpression === "" ? '0' : inputExpression;
+};
+
+const solve = () => {
+    let operand = "";
+    let isFloatUsed = false;
+    let isFloat = false;
+    let expression = [];
+
+    for (let i = 0; i < inputExpression.length; i++) {
+        switch (inputExpression[i]) {
+            case '/':
+            case '*':
+            case '-':
+            case '+':
+            case '^':
+                if (!isFloat) expression.push(operand + ".0");
+                else expression.push(operand);
+
+                expression.push(inputExpression[i]);
+                operand = "";
+                isFloat = false;
+                break;
+
+            case '.':
+                isFloat = true;
+                operand += '.';
+                isFloatUsed = true;
+                break;
+
+            default:
+                operand += inputExpression[i];
+        }
+    }
+
+    if (operand !== "") {
+        if (!isFloat) expression.push(operand + ".0");
+        else expression.push(operand);
+    } else {
+        expression.pop();
+    }
+
+    if (expression.length === 1) {
+        if (Math.round(expression[0]) == expression[0]) {
+            if (isFloatUsed) return Math.round(expression[0]).toString() + ".0";
+            else return Math.round(expression[0]).toString();
+        } else {
+            return (Math.round(expression[0] * 1000) / 1000).toString();
+        }
+    }
+
+    let i;
+
+    while ((i = expression.indexOf('^')) != -1) {
+        const op1 = parseFloat(expression[i - 1]);
+        const op2 = parseFloat(expression[i + 1]);
+        const result = Math.pow(op1, op2);
+        expression.splice(i - 1, 3, result);
+    }
+
+    while ((i = expression.indexOf('/')) != -1) {
+        const op1 = Math.trunc(parseFloat(expression[i - 1]) * 1000);
+        const op2 = Math.trunc(parseFloat(expression[i + 1]) * 1000);
+
+        if (op2 === 0) {
+            screenOutput.innerHTML += "Can't Divide By Zero";
+            return "";
+        }
+
+        const result = (op1 / op2);
+        expression.splice(i - 1, 3, result);
+    }
+
+    while ((i = expression.indexOf('*')) != -1) {
+        const op1 = Math.trunc(parseFloat(expression[i - 1]) * 10000);
+        const op2 = Math.trunc(parseFloat(expression[i + 1]) * 10000);
+
+        const result = (op1 * op2) / 100000000;
+        expression.splice(i - 1, 3, result);
+    }
+
+    while ((i = expression.indexOf('+')) != -1) {
+        const op1 = parseFloat(expression[i - 1]) * 1000;
+        const op2 = parseFloat(expression[i + 1]) * 1000;
+
+        expression.splice(i - 1, 3, (op1 + op2) / 1000);
+    }
+
+    while ((i = expression.indexOf('-')) != -1) {
+        const op1 = parseFloat(expression[i - 1]) * 1000;
+        const op2 = parseFloat(expression[i + 1]) * 1000;
+
+        expression.splice(i - 1, 3, (op1 - op2) / 1000);
+    }
+
+    if (Math.round(expression[0]) == expression[0]) {
+        if (isFloatUsed) return Math.round(expression[0]).toString() + ".0";
+        else return Math.round(expression[0]).toString();
+    } else {
+        return (Math.round(expression[0] * 1000) / 1000).toString();
+    }
+};
+
+
+    </script>
+</html>
